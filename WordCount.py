@@ -28,7 +28,7 @@ def removeSectionHeadings(text):
 
 def revealTextInCommands(text):
 	while True:
-		text, n1 = re.subn(r'\\(ps|ss|used|usemore|pr)\{([^\\]+)\}', r'\2', text)
+		text, n1 = re.subn(r'\\(ps|ss|used|usemore|pr)\{([^\\]+?)\}', r'\2', text)
 		text, n2 = re.subn(r'\\topicKeyword{.+?}{(.+?)}', r'\1', text)
 		if n1 + n2 == 0:
 			break
