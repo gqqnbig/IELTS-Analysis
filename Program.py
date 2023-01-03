@@ -5,6 +5,8 @@ import sys
 import spacy
 from spacy.matcher import Matcher
 
+import Utils
+
 nlp = spacy.load("en_core_web_sm")
 
 
@@ -116,21 +118,6 @@ def checkBlackwords(doc):
 # print("{}:\t{}".format(nlp.vocab.strings[m[0]], doc[m[1]:m[2]]))
 
 
-def countWords(doc):
-	d = dict()
-	for token in doc:
-		if token.pos_ in ['SPACE', 'PUNCT', 'X', 'SYM']:
-			continue
-
-		if token.lemma_ in d:
-			# Increment count of word by 1
-			d[token.lemma_] = d[token.lemma_] + 1
-		else:
-			# Add the word to dictionary with count 1
-			d[token.lemma_] = 1
-
-	return (dict(sorted(d.items(), key=lambda item: item[1], reverse=True)))
-
 
 if __name__ == '__main__':
 	file = sys.argv[-1]
@@ -187,7 +174,7 @@ if __name__ == '__main__':
 		print('Two few tenses (passive): ' + ', '.join(tenses + passives))
 		print()
 
-	counts = countWords(doc)
+	counts = Utils.countWords(doc)
 
 	# if counts['I'] > 4 * questionCount:
 	# 	print(f'I: {counts["I"]} - too many')
