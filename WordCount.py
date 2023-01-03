@@ -96,6 +96,11 @@ def checkContractions(doc):
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}, 'MORPH': {'IS_SUPERSET': ['Number=Sing']}},
 			   {'TEXT': "'s", 'POS': 'AUX'}]
 	matcher.add("'s", [pattern])
+
+	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
+			   {'TEXT': {'in': ["'ll", "'d"]}, 'POS': 'AUX'}]  # 不需要"are"，因为‘re发音是一样的。
+	matcher.add("'d-'ll", [pattern])
+
 	matches = matcher(doc)
 	if len(matches) > 0:
 		# print('Already has contractions')
@@ -103,9 +108,19 @@ def checkContractions(doc):
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}, 'MORPH': {'IS_SUPERSET': ['Number=Sing']}},
 			   {'TEXT': "is"}]
-	matcher.add("'s", [pattern])
+	matcher.add("is", [pattern])
+
+	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
+			   {'TEXT': "had", 'POS': 'AUX'}]
+	matcher.add("had", [pattern])
+
+	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
+			   {'TEXT': {'in': ["will", "would"]}}]  # 不需要"are"，因为‘re发音是一样的。
+	matcher.add("other", [pattern])
+
 	matches = matcher(doc)
-	# print('Found:')
+	if len(matches)>0:
+		print("Use contractions in the following:", file=sys.stderr)
 	for m in matches:
 		s = m[1] - 2
 		if s < 0:
