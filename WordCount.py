@@ -8,10 +8,10 @@ import sys
 import spacy
 from spacy.matcher import Matcher
 
-nlp = spacy.load("en_core_web_sm")
+# nlp = spacy.load("en_core_web_sm")
 # Large model to deal with "New York's a city."
 # Small model thinks 's here is a particle.
-# nlp = spacy.load("en_core_web_trf")
+nlp = spacy.load("en_core_web_trf")
 
 import Program
 
@@ -161,8 +161,12 @@ def get_mean_std(results):
 
 
 if __name__ == '__main__':
-	# getWords(r'E:\IELTS Speaking\Jerry\Part 2\watch movie again.tex')
+	# count, doc = getWords("B:\home of someone.tex")
+	# for token in doc:
+	# 	print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.morph)
+	# checkContractions(doc)
 	# exit()
+
 	try:
 		p = sys.argv.index('--ref')
 		folder = os.path.abspath(sys.argv[p + 1])
