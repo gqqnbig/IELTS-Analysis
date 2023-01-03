@@ -1,5 +1,12 @@
+import os
+import sys
+
 import pytest
 
+testFolder = os.path.dirname(os.path.abspath(__file__))
+
+# import local packages
+sys.path.append(os.path.join(testFolder, '..'))
 import WordCount
 
 
