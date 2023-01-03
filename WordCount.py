@@ -9,6 +9,9 @@ import spacy
 from spacy.matcher import Matcher
 
 nlp = spacy.load("en_core_web_sm")
+# Large model to deal with "New York's a city."
+# Small model thinks 's here is a particle.
+# nlp = spacy.load("en_core_web_trf")
 
 import Program
 
@@ -86,6 +89,33 @@ def loadTextFromLatexFormat(path):
 	return text
 
 
+def checkContractions(doc):
+	matcher = Matcher(nlp.vocab)
+	# The short form ’s (= is/has) can be written after nouns (including proper names),
+	# question words, "here" and "now" as well as pronouns and unstressed "there".
+	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}, 'MORPH': {'IS_SUPERSET': ['Number=Sing']}},
+			   {'TEXT': "'s", 'POS': 'AUX'}]
+	matcher.add("'s", [pattern])
+	matches = matcher(doc)
+	if len(matches) > 0:
+		# print('Already has contractions')
+		return
+
+	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}, 'MORPH': {'IS_SUPERSET': ['Number=Sing']}},
+			   {'TEXT': "is"}]
+	matcher.add("'s", [pattern])
+	matches = matcher(doc)
+	# print('Found:')
+	for m in matches:
+		s = m[1] - 2
+		if s < 0:
+			s = 0
+		e = m[2] + 2
+		if e > len(doc):
+			e = len(doc)
+		print("{}:\t{}".format(nlp.vocab.strings[m[0]], str(doc[s:e]).strip()), file=sys.stderr)
+
+
 def getWords(path):
 	text = loadTextFromLatexFormat(path)
 	text = text.encode("ascii", "ignore").decode()
@@ -93,13 +123,18 @@ def getWords(path):
 	text = re.sub(r'\(\s*\)', r'', text)
 	doc = nlp(text)
 
+	# for token in doc:
+	# 	print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.morph)
+
 	counts = Program.countWords(doc)
 
 	# print(text)
 	c = sum(counts.values())
 
 	print(f'{path}: {c}')
-	return c
+
+	# checkContractions(doc)
+	return c, doc
 
 
 def get_mean_std(results):
@@ -111,7 +146,8 @@ def get_mean_std(results):
 
 
 if __name__ == '__main__':
-	# getWords(r'E:\IELTS Speaking\Jerry\Part 2\place for sports.tex')
+	# getWords(r'E:\IELTS Speaking\Jerry\Part 2\watch movie again.tex')
+	# exit()
 	try:
 		p = sys.argv.index('--ref')
 		folder = os.path.abspath(sys.argv[p + 1])
@@ -136,13 +172,15 @@ if __name__ == '__main__':
 		print('No enough files to calculate statistics.')
 		exit(0)
 
-	counts = [getWords(f) for f in referenceFiles]
+	counts = [getWords(f)[0] for f in referenceFiles]
 
 	mean, std = get_mean_std(counts)
 
 	print(mean, std)
 
 	for t in targetFiles:
-		count = getWords(t)
+		count, doc = getWords(t)
 		if count < mean - std or count > mean + std:
 			print(f'{os.path.basename(t)}: {count}. The number of words is off range ({mean - std :.2f}, {mean + std :.2f}).', file=sys.stderr)
+
+		checkContractions(doc)
