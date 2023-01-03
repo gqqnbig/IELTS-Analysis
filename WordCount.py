@@ -15,7 +15,7 @@ from spacy.matcher import Matcher
 # Small model thinks 's here is a particle.
 nlp = spacy.load("en_core_web_trf")
 
-import Program
+import Utils
 
 
 def removeSectionHeadings(text):
@@ -143,7 +143,7 @@ def getWords(path):
 	# for token in doc:
 	# 	print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.morph)
 
-	counts = Program.countWords(doc)
+	counts = Utils.countWords(doc)
 
 	# print(text)
 	c = sum(counts.values())
