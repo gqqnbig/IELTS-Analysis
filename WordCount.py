@@ -10,10 +10,16 @@ import sys
 import spacy
 from spacy.matcher import Matcher
 
-# nlp = spacy.load("en_core_web_sm")
-# Large model to deal with "New York's a city."
-# Small model thinks 's here is a particle.
-nlp = spacy.load("en_core_web_trf")
+MODEL_NAME = 'en_core_web_trf'
+try:
+	nlp = spacy.load(MODEL_NAME)
+except:
+	# Large model to deal with "New York's a city."
+	# Small model thinks 's here is a particle.
+	from spacy.cli import download
+
+	download(MODEL_NAME)
+	nlp = spacy.load(MODEL_NAME)
 
 import Utils
 
