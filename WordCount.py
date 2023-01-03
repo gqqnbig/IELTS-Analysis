@@ -88,6 +88,9 @@ def loadTextFromLatexFormat(path):
 
 def getWords(path):
 	text = loadTextFromLatexFormat(path)
+	text = text.encode("ascii", "ignore").decode()
+	text = re.sub(r'\{\s*\}', r'', text)
+	text = re.sub(r'\(\s*\)', r'', text)
 	doc = nlp(text)
 
 	counts = Program.countWords(doc)
