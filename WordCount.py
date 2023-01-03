@@ -40,7 +40,7 @@ def removeCommands(text):
 		# \linebreak[1]
 		text, n1 = re.subn(r'\\(linebreak\[\d\]|pause)', r'', text)
 		# \footnote{...}
-		text, n2 = re.subn(r'\\\w+(\{.+?\})*', r'', text)
+		text, n2 = re.subn(r'\\\w+(\{[^\\]+?\})*', r'', text)
 		# {\cjkfont ...}
 		if n1 + n2 == 0:
 			break
