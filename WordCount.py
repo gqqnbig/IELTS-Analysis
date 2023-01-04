@@ -8,7 +8,7 @@ import statistics
 import sys
 
 import spacy
-from spacy.matcher import Matcher
+from spacy.matcher import Matcher, DependencyMatcher
 
 # nlp = spacy.load("en_core_web_sm")
 # Large model to deal with "New York's a city."
@@ -91,6 +91,76 @@ def loadTextFromLatexFormat(path):
 	return text
 
 
+def checkHaveGot(doc):
+	matcher = Matcher(nlp.vocab)
+	pattern = [{'LEMMA': "have"}, {'TEXT': "got"}]
+	matcher.add("have got", [pattern])
+	matches = matcher(doc)
+	if len(matches) > 0:
+		# print('Already have "have got".')
+		return
+
+	matcher = Matcher(nlp.vocab)
+	pattern = [{'LEMMA': "have"}, {'TEXT': 'to'}, {'POS': 'VERB'}]
+	matcher.add("have to do", [pattern])
+
+	matches1 = matcher(doc)
+	# if len(matches) > 0:
+	# 	print("Use contractions in the following:", file=sys.stderr)
+
+	matcher = DependencyMatcher(nlp.vocab)
+
+	pattern = [
+		{
+			"RIGHT_ID": "start",
+			"RIGHT_ATTRS": {"LEMMA": "have"}
+		},
+		# {
+		#     "LEFT_ID": "start",
+		#     "REL_OP": ">",
+		#     "RIGHT_ID": "founded_subject",
+		#     "RIGHT_ATTRS": {"DEP": "nsubj"},
+		# },
+		{
+			"LEFT_ID": "start",
+			"REL_OP": ">",
+			"RIGHT_ID": "have_object",
+			"RIGHT_ATTRS": {"DEP": "dobj"},
+		},
+		# {
+		#     "LEFT_ID": "founded_object",
+		#     "REL_OP": ">",
+		#     "RIGHT_ID": "founded_object_modifier",
+		#     "RIGHT_ATTRS": {"DEP": {"IN": ["amod", "compound"]}},
+		# }
+	]
+
+	matcher.add("have sth", [pattern])
+	matches2 = matcher(doc)
+
+	if len(matches1) + len(matches2) >= 3:
+		print('See if you can use "have got" in the following:', file=sys.stderr)
+	else:
+		return
+
+	for m in matches1:
+		s = m[1] - 2
+		if s < 0:
+			s = 0
+		e = m[2] + 2
+		if e > len(doc):
+			e = len(doc)
+		print("{}:\t{}".format(nlp.vocab.strings[m[0]], str(doc[s:e]).strip()), file=sys.stderr)
+
+	for m in matches2:
+		match_id, token_ids = m
+		start = min(token_ids)
+		end = max(token_ids)
+		# for i in range(len(token_ids)):
+		# 	print(pattern[i]["RIGHT_ID"] + ":", doc[token_ids[i]].text)
+		print("have sth:\t{}".format(doc[start:end + 1]), file=sys.stderr)
+
+
 def checkContractions(doc):
 	matcher = Matcher(nlp.vocab)
 	# The short form ’s (= is/has) can be written after nouns (including proper names),
@@ -151,6 +221,7 @@ def getWords(path):
 	print(f'{path}: {c}')
 
 	# checkContractions(doc)
+	# checkHaveGot(doc)
 	return c, doc
 
 
@@ -163,6 +234,12 @@ def get_mean_std(results):
 
 
 if __name__ == '__main__':
+	# text = "I watch little television nowadays 'cause I work on computers every day."
+	# doc = nlp(text)
+	#
+	# for token in doc:
+	# 	print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.morph)
+
 	# count, doc = getWords("B:\home of someone.tex")
 	# for token in doc:
 	# 	print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.morph)
