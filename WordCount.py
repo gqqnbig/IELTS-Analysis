@@ -101,7 +101,9 @@ def checkHaveGot(doc):
 		return
 
 	matcher = Matcher(nlp.vocab)
-	pattern = [{'LEMMA': "have"}, {'TEXT': 'to'}, {'POS': 'VERB'}]
+	# It is not considered correct to say *"Last year we had got a house in the city."
+	# https://en.wiktionary.org/wiki/have_got
+	pattern = [{'TEXT': {'IN': ["have", 'has']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
 	matcher.add("have to do", [pattern])
 
 	matches1 = matcher(doc)
@@ -113,7 +115,7 @@ def checkHaveGot(doc):
 	pattern = [
 		{
 			"RIGHT_ID": "start",
-			"RIGHT_ATTRS": {"LEMMA": "have"}
+			"RIGHT_ATTRS": {'TEXT': {'IN': ["have", 'has']}}
 		},
 		# {
 		#     "LEFT_ID": "start",
@@ -139,7 +141,7 @@ def checkHaveGot(doc):
 	matches2 = matcher(doc)
 
 	if len(matches1) + len(matches2) >= 3:
-		print('See if you can use "have got" in the following:', file=sys.stderr)
+		print('See if you can use "have got". "\'ve" is preferred.', file=sys.stderr)
 	else:
 		return
 
@@ -282,3 +284,4 @@ if __name__ == '__main__':
 			print(f'{os.path.basename(t)}: {count}. The number of words is off range ({mean - std :.2f}, {mean + std :.2f}).', file=sys.stderr)
 
 		checkContractions(doc)
+		checkHaveGot(doc)
