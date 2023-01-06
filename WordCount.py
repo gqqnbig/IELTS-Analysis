@@ -93,7 +93,7 @@ def loadTextFromLatexFormat(path):
 
 def checkHaveGot(doc):
 	matcher = Matcher(nlp.vocab)
-	pattern = [{'LEMMA': {'IN': ["have", "'ve"]}}, {'TEXT': "got"}]
+	pattern = [{'LEMMA': {'IN': ["have", 'had', "'ve"]}}, {'LEMMA': 'not', 'OP': '?'}, {'TEXT': "got"}]
 	matcher.add("have got", [pattern])
 	matches = matcher(doc)
 	if len(matches) > 0:
@@ -101,9 +101,7 @@ def checkHaveGot(doc):
 		return
 
 	matcher = Matcher(nlp.vocab)
-	# It is not considered correct to say *"Last year we had got a house in the city."
-	# https://en.wiktionary.org/wiki/have_got
-	pattern = [{'TEXT': {'IN': ["have", 'has']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
+	pattern = [{'TEXT': {'IN': ["have", 'has', 'had']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
 	matcher.add("have to do", [pattern])
 
 	matches1 = matcher(doc)
@@ -111,7 +109,8 @@ def checkHaveGot(doc):
 	# 	print("Use contractions in the following:", file=sys.stderr)
 
 	matcher = DependencyMatcher(nlp.vocab)
-
+	# It is not considered correct to say "Last year we had got a house in the city."
+	# https://en.wiktionary.org/wiki/have_got
 	pattern = [
 		{
 			"RIGHT_ID": "start",
