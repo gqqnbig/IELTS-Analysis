@@ -93,10 +93,12 @@ def loadTextFromLatexFormat(path):
 	return text
 
 
+
+haveGotPatterns = [[{'LEMMA': {'IN': ["have", 'had', "'ve"]}}, {'LEMMA': 'not', 'OP': '?'}, {'TEXT': "got"}]]
+
 def checkHaveGot(doc):
 	matcher = Matcher(nlp.vocab)
-	pattern = [{'LEMMA': {'IN': ["have", 'had', "'ve"]}}, {'LEMMA': 'not', 'OP': '?'}, {'TEXT': "got"}]
-	matcher.add("have got", [pattern])
+	matcher.add("have got", haveGotPatterns)
 	matches = matcher(doc)
 	if len(matches) > 0:
 		# print('Already have "have got".')
