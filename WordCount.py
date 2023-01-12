@@ -177,7 +177,7 @@ def checkContractions(doc):
 	matcher.add("'s", [pattern])
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
-			   {'TEXT': {'in': ["'ll", "'d"]}, 'POS': 'AUX'}]  # 不需要"are"，因为‘re发音是一样的。
+			   {'TEXT': {'in': ["'ll", "'d", "'re"]}, 'POS': 'AUX'}]
 	matcher.add("'d-'ll", [pattern])
 
 	matches = matcher(doc)
@@ -194,7 +194,7 @@ def checkContractions(doc):
 	matcher.add("had @d", [pattern])
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
-			   {'TEXT': {'in': ["will", "would"]}}]  # 不需要"are"，因为‘re发音是一样的。
+			   {'TEXT': {'in': ["will", "would", 'are']}}]
 	matcher.add("other", [pattern])
 
 	matches = matcher(doc)
