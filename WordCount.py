@@ -32,6 +32,8 @@ def removeSectionHeadings(text):
 
 
 def revealTextInCommands(text):
+	# If a command parameter has other latex commands, this function will not reveal the parameter.
+	# like \usemore{ ... \textipa{} ... }
 	while True:
 		text, n1 = re.subn(r'\\(ps|ss|used|usemore|pr|xout)\{([^\\]+?)\}', r'\2', text)
 		text, n2 = re.subn(r'\\topicKeyword{.+?}{(.+?)}', r'\1', text)
