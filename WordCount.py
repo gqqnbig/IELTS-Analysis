@@ -187,7 +187,7 @@ def checkContractions(doc):
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
 			   {'TEXT': "had", 'POS': 'AUX'}]
-	matcher.add("had", [pattern])
+	matcher.add("had @d", [pattern])
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
 			   {'TEXT': {'in': ["will", "would"]}}]  # 不需要"are"，因为‘re发音是一样的。
