@@ -32,6 +32,8 @@ def removeSectionHeadings(text):
 
 
 def revealTextInCommands(text):
+	# If a command parameter has other latex commands, this function will not reveal the parameter.
+	# like \usemore{ ... \textipa{} ... }
 	while True:
 		text, n1 = re.subn(r'\\(ps|ss|used|usemore|pr|xout)\{([^\\]+?)\}', r'\2', text)
 		text, n2 = re.subn(r'\\topicKeyword{.+?}{(.+?)}', r'\1', text)
@@ -101,7 +103,9 @@ def checkHaveGot(doc):
 		return
 
 	matcher = Matcher(nlp.vocab)
-	pattern = [{'TEXT': {'IN': ["have", 'has', 'had']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
+	# "Have got to do" can only be used in the present tense.
+	# https://dictionary.cambridge.org/grammar/british-grammar/have-got-to-and-have-to
+	pattern = [{'OP': '!', 'LEMMA': 'will'}, {'TEXT': {'IN': ["have", 'has']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
 	matcher.add("have to do", [pattern])
 
 	matches1 = matcher(doc)
@@ -185,7 +189,7 @@ def checkContractions(doc):
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
 			   {'TEXT': "had", 'POS': 'AUX'}]
-	matcher.add("had", [pattern])
+	matcher.add("had @d", [pattern])
 
 	pattern = [{'POS': {'in': ['NOUN', 'PROPN']}},
 			   {'TEXT': {'in': ["will", "would"]}}]  # 不需要"are"，因为‘re发音是一样的。
