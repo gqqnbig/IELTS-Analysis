@@ -1,11 +1,16 @@
 import glob
 import os
 import sys
+import logging
 
 import spacy
 from spacy.matcher import Matcher
 
 from WordCount import loadTextFromLatexFormat
+
+logging.basicConfig(level=logging.INFO)
+suggestionLogger = logging.getLogger('suggestion')
+suggestionLogger.setLevel(logging.INFO)
 
 # try:
 # 	nlp = spacy.load("en_core_web_sm")
@@ -88,11 +93,10 @@ def checkAdvAdjCollocation(doc):
 		ruleName = matcher.vocab.strings[ruleId]
 		heads = ruleName.split('/')
 		if any(h in text for h in heads):
-			print(f'{ruleName} is already used.')
+			logging.debug(f'{ruleName} is already used.')
 			matcher.remove(ruleName)
 
 	matches = matcher(doc)
-
 
 	revisionPoints = {}
 	for m in matches:
@@ -108,16 +112,22 @@ def checkAdvAdjCollocation(doc):
 			revisionPoints[text] = adv
 
 	if len(revisionPoints) > 10:
-		print("Try to add an adverb to the following sentences:", file=sys.stderr)
+		suggestionLogger.info("Try to add an adverb to the following sentences:")
 	else:
 		return
 	for text in revisionPoints:
-		print(f"{revisionPoints[text]}:\t{text}", file=sys.stderr)
-	print(f'Totally {len(revisionPoints)} possible revisions.')
-
+		suggestionLogger.info(f"{revisionPoints[text]}:\t{text}")
+	logging.info(f'Totally {len(revisionPoints)} possible revisions.')
 
 
 if __name__ == '__main__':
+
+	try:
+		p = sys.argv.index('--suggestion-file')
+		suggestionLogger.addHandler(logging.FileHandler(sys.argv[p + 1]))
+	except:
+		pass
+
 	targetFiles = []
 	# The first argument is the file name of this script.
 	for i in range(len(sys.argv) - 1):
