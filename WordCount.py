@@ -90,6 +90,10 @@ def loadTextFromLatexFormat(path):
 	text = revealTextInCommands(text)
 
 	text = removeCommands(text)
+
+	text = text.encode("ascii", "ignore").decode()
+	text = re.sub(r'\{\s*\}', r'', text)
+	text = re.sub(r'\(\s*\)', r'', text)
 	return text
 
 
@@ -210,9 +214,6 @@ def checkContractions(doc):
 
 def getWords(path):
 	text = loadTextFromLatexFormat(path)
-	text = text.encode("ascii", "ignore").decode()
-	text = re.sub(r'\{\s*\}', r'', text)
-	text = re.sub(r'\(\s*\)', r'', text)
 	doc = nlp(text)
 
 	# for token in doc:
