@@ -2,14 +2,21 @@ import os
 import sys
 
 import spacy
+from spacy.matcher import Matcher
 
 from WordCount import loadTextFromLatexFormat
-
 
 # try:
 # 	nlp = spacy.load("en_core_web_sm")
 # except:
-# 	nlp = spacy.load("en_core_web_trf")
+nlp = spacy.load("en_core_web_trf")
+
+
+def createMatchRule(textList):
+	if any(' ' in t or '-' in t for t in textList):
+		raise Exception(f"You can't have more than one word in text list. You passed in {textList}.")
+
+	return [{'OP': '!', 'POS': 'ADV'}, {'TEXT': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}]
 
 
 def checkAdvAdjCollocation(text):
