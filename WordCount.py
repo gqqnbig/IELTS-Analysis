@@ -103,7 +103,9 @@ def checkHaveGot(doc):
 		return
 
 	matcher = Matcher(nlp.vocab)
-	pattern = [{'TEXT': {'IN': ["have", 'has', 'had']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
+	# "Have got to do" can only be used in the present tense.
+	# https://dictionary.cambridge.org/grammar/british-grammar/have-got-to-and-have-to
+	pattern = [{'OP': '!', 'LEMMA': 'will'}, {'TEXT': {'IN': ["have", 'has']}}, {'TEXT': 'to'}, {'POS': 'VERB'}]
 	matcher.add("have to do", [pattern])
 
 	matches1 = matcher(doc)
