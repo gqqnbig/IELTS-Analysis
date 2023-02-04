@@ -17,7 +17,7 @@ def createMatchRule(textList):
 	if any(' ' in t or '-' in t for t in textList):
 		raise Exception(f"You can't have more than one word in text list. You passed in {textList}.")
 
-	return [{'OP': '!', 'POS': 'ADV'}, {'TEXT': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}]
+	return [{'OP': '!', 'POS': 'ADV'}, {'LOWER': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}]
 
 
 def checkAdvAdjCollocation(doc):
@@ -27,8 +27,8 @@ def checkAdvAdjCollocation(doc):
 	matcher.add('unbelievably/ridiculously/incredibly', [createMatchRule(['cheap', 'expensive', 'big', 'small', 'long', 'short', 'easy', 'early', 'late', 'cold', 'old'])])
 	matcher.add('potentially', [
 		createMatchRule(['dangerous', 'hazardous', 'fatal', 'toxic', 'fruitful']),
-		[{'OP': '!', 'POS': 'ADV'}, {'TEXT': 'game'}, {'TEXT': '-'}, {'TEXT': 'changing'}],
-		[{'OP': '!', 'POS': 'ADV'}, {'TEXT': 'life'}, {'TEXT': 'threatening'}],
+		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'game'}, {'LOWER': '-'}, {'LOWER': 'changing'}],
+		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'life'}, {'LOWER': 'threatening'}],
 	])
 	matcher.add('blatantly', [createMatchRule(['false', 'unfair', 'untrue', 'dishonest', 'wrong', 'mistaken'])])
 	matcher.add('widely', [createMatchRule(['believed', 'practiced', 'spoken', 'used', 'distributed', 'known', 'publicized', 'available'])])
@@ -38,7 +38,11 @@ def checkAdvAdjCollocation(doc):
 	matcher.add('patently', [createMatchRule(['true', 'false', 'clear', 'clever'])])
 	matcher.add('wildly', [createMatchRule(['inappropriate', 'inaccurate', 'exaggerated', 'unrealistic', 'popular', 'successful', 'unsuccessful'])])
 	matcher.add('mildly', [createMatchRule(['entertained', 'surprised', 'amused', 'irritated', 'offensive'])])
-	matcher.add('downright', [createMatchRule(['wrong', 'dishonest', 'hostile', 'rude', 'disgraceful', 'immoral', 'ugly', 'mean'])])
+	matcher.add('downright', [
+		createMatchRule(['wrong', 'dishonest', 'hostile', 'rude', 'disgraceful', 'immoral', 'ugly']),
+		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'mean', 'POS': 'ADJ'}],
+		[{'LOWER': 'mean', 'POS': 'ADJ', 'IS_SENT_START': True}],
+	])
 	matcher.add('heavily', [createMatchRule(['armed', 'pregnant', 'subsidized', 'criticized'])])
 	matcher.add('seriously', [createMatchRule(['stubborn', 'genius', 'strong', 'smart', 'delicious', 'good', 'injured', 'damaged', 'hurt', 'wounded'])])
 	matcher.add('strictly', [createMatchRule(['speaking', 'regulated', 'limited', 'comparative'])])
@@ -50,7 +54,7 @@ def checkAdvAdjCollocation(doc):
 	matcher.add('fully/extensively', [createMatchRule(['prepared', 'understand', 'comprehend', 'informed', 'automated', 'equipped'])])
 	matcher.add('totally/completely/entirely/quite', [
 		createMatchRule(['unprepared', 'unexpected', 'wrong', 'composed', 'inadequate', 'different', 'dependent', 'harmless', 'unbelievable', 'unacceptable', 'irrational', 'unaware', 'oblivious', 'ignorant', 'intolerant', 'inaccurate', 'unthinkable', 'improbable', 'unconvincing']),
-		[{'OP': '!', 'POS': 'ADV'}, {'TEXT': 'out'}, {'TEXT': 'of'}, {'TEXT': 'control'}],
+		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'out'}, {'LOWER': 'of'}, {'LOWER': 'control'}],
 	])
 	matcher.add('constantly/persistently/continuously', [createMatchRule(['study', 'develop', 'improve'])])
 	matcher.add('extremely/significantly/exceptionally/intensively', [createMatchRule(['useful', 'confident', 'important', 'dangerous', 'suspicious'])])
@@ -61,7 +65,7 @@ def checkAdvAdjCollocation(doc):
 	matcher.add('astronomically', [createMatchRule(['high', 'low', 'large', 'expressive', 'immense', 'difficult'])])
 	matcher.add('loosely', [
 		createMatchRule(['construed', 'structured', 'connected', 'related']),
-		[{'OP': '!', 'POS': 'ADV'}, {'TEXT': 'based'}, {'TEXT': 'on'}],
+		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'based'}, {'LOWER': 'on'}],
 	])
 	matcher.add('excessively', [createMatchRule(['detailed'])])
 
