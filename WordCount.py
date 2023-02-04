@@ -157,8 +157,6 @@ def checkHaveGot(doc):
 		if s < 0:
 			s = 0
 		e = m[2] + 2
-		if e > len(doc):
-			e = len(doc)
 		print("{}:\t{}".format(nlp.vocab.strings[m[0]], str(doc[s:e]).strip()), file=sys.stderr)
 
 	for m in matches2:
@@ -207,8 +205,6 @@ def checkContractions(doc):
 		if s < 0:
 			s = 0
 		e = m[2] + 2
-		if e > len(doc):
-			e = len(doc)
 		print("{}:\t{}".format(nlp.vocab.strings[m[0]], str(doc[s:e]).strip()), file=sys.stderr)
 
 
