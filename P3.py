@@ -21,71 +21,71 @@ nlp = spacy.load("en_core_web_trf")
 def createMatchRule(textList):
 	if any(' ' in t or '-' in t for t in textList):
 		raise Exception(f"You can't have more than one word in text list. You passed in {textList}.")
+	if any(t != t.lower() or '-' in t for t in textList):
+		raise Exception(f"You have to pass in lower case text. You passed in {textList}.")
 
-	return [{'OP': '!', 'POS': 'ADV'}, {'LOWER': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}]
+	return [[{'OP': '!', 'POS': 'ADV'}, {'LOWER': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}],
+			[{'LOWER': {'IN': textList}, 'IS_SENT_START': True}, {'OP': '!', 'TEXT': '-'}]]
 
 
 def checkAdvAdjCollocation(doc):
 	matcher = Matcher(nlp.vocab)
-	matcher.add("highly", [createMatchRule(['successful', 'vital', 'probable', 'improbable', 'competitive', 'recommended', 'effective', 'contagious', 'critical', 'intelligent', 'likely', 'unlikely', 'sensitive', 'controversial', 'suspicious'])])
-	matcher.add('utterly/absolutely', [createMatchRule(['disastrous', 'disgusting', 'disgusted', 'impossible', 'useless', 'miserable', 'wrong', 'pointless', 'worthless', 'fabulous', 'unrealistic'])])
-	matcher.add('unbelievably/ridiculously/incredibly', [createMatchRule(['cheap', 'expensive', 'big', 'small', 'long', 'short', 'easy', 'early', 'late', 'cold', 'old'])])
-	matcher.add('potentially', [
-		createMatchRule(['dangerous', 'hazardous', 'fatal', 'toxic', 'fruitful']),
-		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'game'}, {'LOWER': '-'}, {'LOWER': 'changing'}],
-		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'life'}, {'LOWER': 'threatening'}],
-	])
-	matcher.add('blatantly', [createMatchRule(['false', 'unfair', 'untrue', 'dishonest', 'wrong', 'mistaken'])])
-	matcher.add('widely', [createMatchRule(['believed', 'practiced', 'spoken', 'used', 'distributed', 'known', 'publicized', 'available'])])
+	matcher.add("highly", createMatchRule(['successful', 'vital', 'probable', 'improbable', 'competitive', 'recommended', 'effective', 'contagious', 'critical', 'intelligent', 'likely', 'unlikely', 'sensitive', 'controversial', 'suspicious']))
+	matcher.add('utterly/absolutely', createMatchRule(['disastrous', 'disgusting', 'disgusted', 'impossible', 'useless', 'miserable', 'wrong', 'pointless', 'worthless', 'fabulous', 'unrealistic']))
+	matcher.add('unbelievably/ridiculously/incredibly', createMatchRule(['cheap', 'expensive', 'big', 'small', 'long', 'short', 'easy', 'early', 'late', 'cold', 'old']))
+	matcher.add('potentially',
+				createMatchRule(['dangerous', 'hazardous', 'fatal', 'toxic', 'fruitful']) +
+				[[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'game'}, {'LOWER': '-'}, {'LOWER': 'changing'}],
+				 [{'LOWER': 'game', 'IS_SENT_START': True}, {'LOWER': '-'}, {'LOWER': 'changing'}],
+				 [{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'life'}, {'LOWER': 'threatening'}],
+				 [{'LOWER': 'life', 'IS_SENT_START': True}, {'LOWER': 'threatening'}]])
+	matcher.add('blatantly', createMatchRule(['false', 'unfair', 'untrue', 'dishonest', 'wrong', 'mistaken']))
+	matcher.add('widely', createMatchRule(['believed', 'practiced', 'spoken', 'used', 'distributed', 'known', 'publicized', 'available']))
 
-	matcher.add('absurdly', [createMatchRule(['low', 'high', 'easy', 'difficult'])])
-	matcher.add('thoroughly', [createMatchRule(['prepared', 'enjoyable', 'convinced', 'agree', 'satisfying', 'clean'])])
-	matcher.add('patently', [createMatchRule(['true', 'false', 'clear', 'clever'])])
-	matcher.add('wildly', [createMatchRule(['inappropriate', 'inaccurate', 'exaggerated', 'unrealistic', 'popular', 'successful', 'unsuccessful'])])
-	matcher.add('mildly', [createMatchRule(['entertained', 'surprised', 'amused', 'irritated', 'offensive'])])
-	matcher.add('downright', [
-		createMatchRule(['wrong', 'dishonest', 'hostile', 'rude', 'disgraceful', 'immoral', 'ugly']),
-		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'mean', 'POS': 'ADJ'}],
-		[{'LOWER': 'mean', 'POS': 'ADJ', 'IS_SENT_START': True}],
-	])
-	matcher.add('heavily', [createMatchRule(['armed', 'pregnant', 'subsidized', 'criticized'])])
-	matcher.add('seriously', [createMatchRule(['stubborn', 'genius', 'strong', 'smart', 'delicious', 'good', 'injured', 'damaged', 'hurt', 'wounded'])])
-	matcher.add('strictly', [createMatchRule(['speaking', 'regulated', 'limited', 'comparative'])])
-	matcher.add('bitterly', [createMatchRule(['disappointed', 'resentful', 'sad', 'regretful', 'complain', 'cry', 'weep', 'cold', 'opposed'])])
-	matcher.add('deeply', [createMatchRule(['concerned', 'ashamed', 'moved', 'attached', 'divided', 'hurt', 'regretful', 'affected', 'touched'])])
-	matcher.add('strongly', [createMatchRule(['oppose', 'influence', 'believe', 'deny', 'recommend', 'argue', 'object', 'support', 'suggest', 'correlate'])])
+	matcher.add('absurdly', createMatchRule(['low', 'high', 'easy', 'difficult']))
+	matcher.add('thoroughly', createMatchRule(['prepared', 'enjoyable', 'convinced', 'agree', 'satisfying', 'clean']))
+	matcher.add('patently', createMatchRule(['true', 'false', 'clear', 'clever']))
+	matcher.add('wildly', createMatchRule(['inappropriate', 'inaccurate', 'exaggerated', 'unrealistic', 'popular', 'successful', 'unsuccessful']))
+	matcher.add('mildly', createMatchRule(['entertained', 'surprised', 'amused', 'irritated', 'offensive']))
+	matcher.add('downright', createMatchRule(['wrong', 'dishonest', 'hostile', 'rude', 'disgraceful', 'immoral', 'ugly']) +
+				[[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'mean', 'POS': 'ADJ'}],
+				 [{'LOWER': 'mean', 'POS': 'ADJ', 'IS_SENT_START': True}]])
+	matcher.add('heavily', createMatchRule(['armed', 'pregnant', 'subsidized', 'criticized']))
+	matcher.add('seriously', createMatchRule(['stubborn', 'genius', 'strong', 'smart', 'delicious', 'good', 'injured', 'damaged', 'hurt', 'wounded']))
+	matcher.add('strictly', createMatchRule(['regulated', 'limited', 'necessary', 'personal']))
+	matcher.add('bitterly', createMatchRule(['disappointed', 'resentful', 'sad', 'regretful', 'complain', 'cry', 'weep', 'cold', 'opposed']))
+	matcher.add('deeply', createMatchRule(['concerned', 'ashamed', 'moved', 'attached', 'divided', 'hurt', 'regretful', 'affected', 'touched']))
+	matcher.add('strongly', createMatchRule(['oppose', 'influence', 'believe', 'deny', 'recommend', 'argue', 'object', 'support', 'suggest', 'correlate']))
 
-	matcher.add('perfectly', [createMatchRule(['normal', 'balanced', 'safe', 'serious', 'acceptable', 'ordinary', 'disgusting'])])
-	matcher.add('fully/extensively', [createMatchRule(['prepared', 'understand', 'comprehend', 'informed', 'automated', 'equipped'])])
-	matcher.add('totally/completely/entirely/quite', [
-		createMatchRule(['unprepared', 'unexpected', 'wrong', 'composed', 'inadequate', 'different', 'dependent', 'harmless', 'unbelievable', 'unacceptable', 'irrational', 'unaware', 'oblivious', 'ignorant', 'intolerant', 'inaccurate', 'unthinkable', 'improbable', 'unconvincing']),
-		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'out'}, {'LOWER': 'of'}, {'LOWER': 'control'}],
-	])
-	matcher.add('constantly/persistently/continuously', [createMatchRule(['study', 'develop', 'improve'])])
-	matcher.add('extremely/significantly/exceptionally/intensively', [createMatchRule(['useful', 'confident', 'important', 'dangerous', 'suspicious'])])
+	matcher.add('perfectly', createMatchRule(['normal', 'balanced', 'safe', 'serious', 'acceptable', 'ordinary', 'disgusting']))
+	matcher.add('fully/extensively', createMatchRule(['prepared', 'understand', 'comprehend', 'informed', 'automated', 'equipped']))
+	matcher.add('totally/completely/entirely/quite', createMatchRule(['unprepared', 'unexpected', 'wrong', 'composed', 'inadequate', 'different', 'dependent', 'harmless', 'unbelievable', 'unacceptable', 'irrational', 'unaware', 'oblivious', 'ignorant', 'intolerant', 'inaccurate', 'unthinkable', 'improbable', 'unconvincing']) +
+				[[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'out'}, {'LOWER': 'of'}, {'LOWER': 'control'}],
+				 [{'LOWER': 'out', 'IS_SENT_START': True}, {'LOWER': 'of'}, {'LOWER': 'control'}]])
+	matcher.add('constantly/persistently/continuously', createMatchRule(['study', 'develop', 'improve']))
+	matcher.add('extremely/significantly/exceptionally/intensively', createMatchRule(['useful', 'confident', 'important', 'dangerous', 'suspicious']))
 
-	matcher.add('hopelessly', [createMatchRule(['addicted', 'romantic', 'optimistic'])])
-	matcher.add('vaguely', [createMatchRule(['familiar', 'aware', 'remember', 'worded', 'threatening'])])
-	matcher.add('financially', [createMatchRule(['active', 'independent', 'secure'])])
-	matcher.add('astronomically', [createMatchRule(['high', 'low', 'large', 'expressive', 'immense', 'difficult'])])
-	matcher.add('loosely', [
-		createMatchRule(['construed', 'structured', 'connected', 'related']),
-		[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'based'}, {'LOWER': 'on'}],
-	])
-	matcher.add('excessively', [createMatchRule(['detailed'])])
+	matcher.add('hopelessly', createMatchRule(['addicted', 'romantic', 'optimistic']))
+	matcher.add('vaguely', createMatchRule(['familiar', 'aware', 'remember', 'worded', 'threatening']))
+	matcher.add('financially', createMatchRule(['active', 'independent', 'secure']))
+	matcher.add('astronomically', createMatchRule(['high', 'low', 'large', 'expressive', 'immense', 'difficult']))
+	matcher.add('loosely', createMatchRule(['construed', 'structured', 'connected', 'related']) +
+				[[{'OP': '!', 'POS': 'ADV'}, {'LOWER': 'based'}, {'LOWER': 'on'}],
+				 [{'LOWER': 'based', 'IS_SENT_START': True}, {'LOWER': 'on'}]])
+	matcher.add('excessively', createMatchRule(['detailed']))
 
-	matcher.add('vastly', [createMatchRule(['different'])])
-	matcher.add('simply', [createMatchRule(['ridiculous', 'disastrous'])])
-	matcher.add('undoubtedly', [createMatchRule(['threatening'])])
-	matcher.add('truly', [createMatchRule(['handy'])])
-	matcher.add('entirely', [createMatchRule(['unfathomable'])])
-	matcher.add('overly', [createMatchRule(['competitive'])])
+	matcher.add('vastly', createMatchRule(['different']))
+	matcher.add('simply', createMatchRule(['ridiculous', 'disastrous']))
+	matcher.add('undoubtedly', createMatchRule(['threatening']))
+	matcher.add('truly', createMatchRule(['handy']))
+	matcher.add('entirely', createMatchRule(['unfathomable']))
+	matcher.add('overly', createMatchRule(['competitive']))
 
-	matcher.add('unreservedly', [createMatchRule(['agree'])])
-	matcher.add('certainly', [createMatchRule(['harmful'])])
-	matcher.add('positively', [createMatchRule(['brilliant'])])
-	matcher.add('conclusively', [createMatchRule(['inaccurate'])])
-	matcher.add('decidedly', [createMatchRule(['dangerous'])])
+	matcher.add('unreservedly', createMatchRule(['agree']))
+	matcher.add('certainly', createMatchRule(['harmful']))
+	matcher.add('positively', createMatchRule(['brilliant']))
+	matcher.add('conclusively', createMatchRule(['inaccurate']))
+	matcher.add('decidedly', createMatchRule(['dangerous']))
 
 	text = str(doc[0:])
 	# copy keys to a new list because we change the dict during iteration.
