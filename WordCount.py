@@ -76,6 +76,9 @@ def loadTextFromLatexFormat(path):
 				lines[i] = ""
 
 	text = '\n'.join(lines)
+	# connect single line breaks.
+	text = re.sub(r'([^\n])\n([^\n])', r'\1 \2', text)
+
 	# manual hyphenation
 	text = text.replace(r'\-', '')
 
