@@ -121,6 +121,11 @@ def checkAdvAdjCollocation(doc):
 
 
 if __name__ == '__main__':
+	if '--help' in sys.argv:
+		print(f'{sys.argv[0]} [files]')
+		print()
+		print('--suggestion-file String\tWrite suggestions to this file instead of printing them to stdout.')
+		exit()
 
 	try:
 		p = sys.argv.index('--suggestion-file')
