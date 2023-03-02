@@ -76,6 +76,9 @@ def loadTextFromLatexFormat(path):
 				lines[i] = ""
 
 	text = '\n'.join(lines)
+	# connect single line breaks.
+	text = re.sub(r'([^\n])\n([^\n])', r'\1 \2', text)
+
 	# manual hyphenation
 	text = text.replace(r'\-', '')
 
@@ -90,6 +93,10 @@ def loadTextFromLatexFormat(path):
 	text = revealTextInCommands(text)
 
 	text = removeCommands(text)
+
+	text = text.encode("ascii", "ignore").decode()
+	text = re.sub(r'\{\s*\}', r'', text)
+	text = re.sub(r'\(\s*\)', r'', text)
 	return text
 
 
@@ -153,8 +160,6 @@ def checkHaveGot(doc):
 		if s < 0:
 			s = 0
 		e = m[2] + 2
-		if e > len(doc):
-			e = len(doc)
 		print("{}:\t{}".format(nlp.vocab.strings[m[0]], str(doc[s:e]).strip()), file=sys.stderr)
 
 	for m in matches2:
@@ -203,16 +208,11 @@ def checkContractions(doc):
 		if s < 0:
 			s = 0
 		e = m[2] + 2
-		if e > len(doc):
-			e = len(doc)
 		print("{}:\t{}".format(nlp.vocab.strings[m[0]], str(doc[s:e]).strip()), file=sys.stderr)
 
 
 def getWords(path):
 	text = loadTextFromLatexFormat(path)
-	text = text.encode("ascii", "ignore").decode()
-	text = re.sub(r'\{\s*\}', r'', text)
-	text = re.sub(r'\(\s*\)', r'', text)
 	doc = nlp(text)
 
 	# for token in doc:
