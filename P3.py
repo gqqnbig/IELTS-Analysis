@@ -24,7 +24,7 @@ def createMatchRule(textList):
 	if any(t != t.lower() or '-' in t for t in textList):
 		raise Exception(f"You have to pass in lower case text. You passed in {textList}.")
 
-	return [[{'OP': '!', 'POS': 'ADV'}, {'LOWER': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}],
+	return [[{'POS': {'NOT_IN': ['ADV']}, 'TEXT': {'NOT_IN': ['little', 'bit']}}, {'LOWER': {'IN': textList}}, {'OP': '!', 'TEXT': '-'}],
 			[{'LOWER': {'IN': textList}, 'IS_SENT_START': True}, {'OP': '!', 'TEXT': '-'}]]
 
 
